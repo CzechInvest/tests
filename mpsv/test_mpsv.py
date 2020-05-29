@@ -2,6 +2,7 @@ import requests
 import sparql
 import json
 
+import urllib
 
 def test_sparql():
     month = 3
@@ -55,10 +56,13 @@ def test_sparql():
             "ORDER BY DESC(?rok), DESC(?mesic), ASC(?nazevObce), ASC(?nazevOkresu)"
             ).format(month=month, year=year)
 
-    s = sparql.Service("https://www.mpsv.cz/sparql/", "utf-8", "POST",
-        accept='application/json')
-    result = s.query(data, raw=True)
-    #response = requests.post("https://www.mpsv.cz/sparql/", data=data,
-    #        headers={"Accept": "application/json"})
-    data = json.load(result)
-    assert data
+    try:
+        s = sparql.Service("https://www.mpsv.cz/sparql/", "utf-8", "POST",
+            accept='application/json')
+        result = s.query(data, raw=True)
+        #response = requests.post("https://www.mpsv.cz/sparql/", data=data,
+        #        headers={"Accept": "application/json"})
+        data = json.load(result.decode("utf-8"))
+        assert data
+    except urllib.error.HTTPError as e:
+        raise e
